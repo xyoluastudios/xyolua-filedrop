@@ -1,0 +1,19 @@
+services:
+  filedrop:
+    build: .
+    image: xyolua-filedrop
+    container_name: filedrop
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    # All options: see .env.example
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - filedrop-data:/data
+
+volumes:
+  filedrop-data:

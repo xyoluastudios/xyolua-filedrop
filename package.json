@@ -1,0 +1,43 @@
+{
+  "name": "xyolua-filedrop",
+  "version": "1.0.0",
+  "description": "Self-hosted, temporary file and link sharing with expiry, password protection, download limits and automatic deletion.",
+  "keywords": [
+    "file-sharing",
+    "self-hosted",
+    "file-upload",
+    "temporary",
+    "wetransfer-alternative",
+    "pastebin",
+    "privacy"
+  ],
+  "homepage": "https://github.com/xyoluastudios/xyolua-filedrop#readme",
+  "bugs": "https://github.com/xyoluastudios/xyolua-filedrop/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xyoluastudios/xyolua-filedrop.git"
+  },
+  "license": "MIT",
+  "author": "XyoLua Studios",
+  "type": "module",
+  "main": "src/server.js",
+  "bin": {
+    "xyolua-filedrop": "src/server.js"
+  },
+  "files": [
+    "src",
+    "public"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "qrcode-generator": "^2.0.4"
+  }
+}

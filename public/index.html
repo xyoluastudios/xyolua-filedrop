@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XyoLua FileDrop</title>
+    <meta name="description" content="Share files and links that expire: password protection, download limits and automatic deletion. Open source and self-hostable." />
+    <meta name="theme-color" content="#07080c" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="XyoLua FileDrop" />
+    <meta property="og:description" content="Share files and links that delete themselves." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/app.css" />
+    <script type="module" src="/assets/upload.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="top">
+        <a class="brand" href="/">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <defs>
+              <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#a78bfa" />
+                <stop offset=".5" stop-color="#6366f1" />
+                <stop offset="1" stop-color="#22d3ee" />
+              </linearGradient>
+            </defs>
+            <rect width="32" height="32" rx="9" fill="url(#logo-g)" />
+            <path d="M16 6.2c-4 4.7-6.6 8.2-6.6 11.4a6.6 6.6 0 0 0 13.2 0c0-3.2-2.6-6.7-6.6-11.4z" fill="#fff" />
+            <path d="M16 21.6v-6.2m0 0-2.7 2.7m2.7-2.7 2.7 2.7" stroke="#5b47e0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg>
+          <span data-site-name>XyoLua FileDrop</span>
+        </a>
+        <nav class="top-nav">
+          <button class="ghost-btn" type="button" data-lang-toggle><span data-icon="globe"></span><span class="label">Deutsch</span></button>
+          <a class="ghost-btn" href="https://github.com/xyoluastudios/xyolua-filedrop" target="_blank" rel="noopener noreferrer">
+            <span data-icon="code"></span><span class="label" data-i18n="nav.source">Source code</span>
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="eyebrow"><span class="dot"></span><span data-i18n="hero.badge">Files delete themselves</span></div>
+          <h1><span data-i18n="hero.title1">Share files.</span><br /><span class="grad" data-i18n="hero.title2">Gone when you say so.</span></h1>
+          <p data-i18n="hero.sub">Upload files or share a link with an expiry time, an optional password and a download limit.</p>
+        </section>
+
+        <!-- 1. compose -->
+        <section class="card" id="composer">
+          <div class="card-head">
+            <div class="segmented" role="group" id="mode-switch">
+              <button type="button" data-mode="files" aria-pressed="true"><span data-icon="files"></span><span data-i18n="tab.files">Files</span></button>
+              <button type="button" data-mode="link" aria-pressed="false"><span data-icon="link"></span><span data-i18n="tab.link">Link</span></button>
+            </div>
+          </div>
+
+          <div id="files-pane">
+            <div class="dropzone" id="dropzone" role="button" tabindex="0">
+              <div class="dz-icon"><span data-icon="upload"></span></div>
+              <div class="dz-text">
+                <div class="dz-title" id="dz-title" data-i18n="dz.title">Drop files here</div>
+                <div class="dz-sub" data-i18n="dz.sub">or click to browse</div>
+                <div class="dz-limits" id="dz-limits"></div>
+              </div>
+              <input type="file" id="file-input" multiple hidden />
+            </div>
+            <ul class="file-list" id="file-list"></ul>
+            <div class="list-foot" id="list-foot" hidden>
+              <span id="files-summary"></span>
+              <button type="button" class="text-btn" id="clear-files" data-i18n="files.clear">Remove all</button>
+            </div>
+          </div>
+
+          <div id="link-pane" class="link-field" hidden>
+            <label class="field-label" for="link-input"><span data-icon="link"></span><span data-i18n="link.label">Link to share</span></label>
+            <input class="input mono" id="link-input" type="url" inputmode="url" autocomplete="off" spellcheck="false" data-i18n-placeholder="link.placeholder" />
+            <p class="hint" data-i18n="link.hint"></p>
+          </div>
+
+          <div class="options">
+            <div class="field full">
+              <div class="field-label"><span data-icon="clock"></span><span data-i18n="opt.expiry">Expires after</span></div>
+              <div class="chips" id="expiry-chips" role="group"></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span data-icon="download"></span><span id="downloads-label" data-i18n="opt.downloads">Download limit</span></div>
+              <div class="chips" id="download-chips" role="group"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="password-input">
+                <span data-icon="lock"></span><span data-i18n="opt.password">Password</span><span class="opt">· <span data-i18n="opt.optional">optional</span></span>
+              </label>
+              <div class="input-wrap">
+                <input class="input" id="password-input" type="password" autocomplete="new-password" maxlength="256" data-i18n-placeholder="opt.password.placeholder" />
+                <button type="button" class="icon-btn" id="toggle-password" data-i18n-aria-label="opt.showPassword"><span data-icon="eye"></span></button>
+              </div>
+            </div>
+            <div class="field full" id="upload-key-field" hidden>
+              <label class="field-label" for="upload-key-input"><span data-icon="key"></span><span data-i18n="opt.uploadKey">Upload password</span></label>
+              <input class="input" id="upload-key-input" type="password" autocomplete="current-password" />
+              <p class="hint" data-i18n="opt.uploadKey.hint"></p>
+            </div>
+          </div>
+
+          <div class="form-error" id="form-error" role="alert" hidden><span data-icon="alert"></span><span id="form-error-text"></span></div>
+
+          <div class="submit-row">
+            <button type="button" class="btn btn-primary btn-block" id="submit-btn"><span data-icon="arrowRight"></span><span data-i18n="btn.create">Create drop</span></button>
+          </div>
+        </section>
+
+        <!-- 2. uploading -->
+        <section class="card" id="progress" hidden>
+          <div class="progress-head">
+            <span class="progress-title" id="progress-title" data-i18n="up.title">Uploading</span>
+            <span class="progress-pct" id="progress-pct">0%</span>
+          </div>
+          <div class="bar"><span id="progress-bar"></span></div>
+          <div class="progress-stats">
+            <span id="progress-bytes"></span>
+            <span id="progress-speed"></span>
+          </div>
+          <button type="button" class="btn btn-block" id="cancel-btn"><span data-icon="x"></span><span data-i18n="btn.cancel">Cancel</span></button>
+        </section>
+
+        <!-- 3. done -->
+        <section class="card" id="result" hidden>
+          <div class="center">
+            <div class="status-icon"><span data-icon="check"></span></div>
+            <h2 class="panel-title" data-i18n="done.title">Your drop is ready</h2>
+            <p class="panel-sub" data-i18n="done.sub"></p>
+            <div class="meta-chips" id="result-chips"></div>
+          </div>
+          <div class="divider"></div>
+          <div class="copy-block">
+            <div class="field-label"><span data-icon="link"></span><span data-i18n="done.share">Share link</span></div>
+            <div class="copy-row" id="share-row">
+              <input class="input mono" id="share-url" readonly />
+            </div>
+            <div class="qr-box" id="qr-box" hidden><div class="qr" id="qr"></div></div>
+          </div>
+          <div class="copy-block">
+            <div class="field-label"><span data-icon="settings"></span><span data-i18n="done.manage">Management link</span></div>
+            <div class="copy-row" id="manage-row">
+              <input class="input mono" id="manage-url" readonly />
+            </div>
+            <div class="secret-note"><span data-icon="key"></span><span data-i18n="done.manage.hint"></span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="btn-row">
+            <a class="btn" id="open-drop" href="/" target="_blank" rel="noopener"><span data-icon="external"></span><span data-i18n="btn.open">Open drop</span></a>
+            <button type="button" class="btn btn-primary" id="new-drop"><span data-icon="plus"></span><span data-i18n="btn.new">New drop</span></button>
+          </div>
+        </section>
+
+        <section id="recent" hidden>
+          <div class="section-head">
+            <h2 data-i18n="recent.title">Your recent drops</h2>
+            <span class="muted"><span data-i18n="recent.hint">Stored only in this browser</span> · <button type="button" class="text-btn" id="clear-recent" data-i18n="recent.clear">Clear</button></span>
+          </div>
+          <ul class="recent-list" id="recent-list"></ul>
+        </section>
+
+        <section class="features">
+          <div class="feature">
+            <div class="feature-icon"><span data-icon="flame"></span></div>
+            <h3 data-i18n="feat.auto.title">Auto-delete</h3>
+            <p data-i18n="feat.auto.text"></p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><span data-icon="shield"></span></div>
+            <h3 data-i18n="feat.pw.title">Password protection</h3>
+            <p data-i18n="feat.pw.text"></p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><span data-icon="gauge"></span></div>
+            <h3 data-i18n="feat.limit.title">Download limits</h3>
+            <p data-i18n="feat.limit.text"></p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><span data-icon="code"></span></div>
+            <h3 data-i18n="feat.oss.title">Open source</h3>
+            <p data-i18n="feat.oss.text"></p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <span><span data-site-name>XyoLua FileDrop</span> <span data-version></span></span>
+        <span>
+          <a href="https://github.com/xyoluastudios/xyolua-filedrop" target="_blank" rel="noopener noreferrer" data-i18n="footer.oss">Open source · MIT license</a>
+          <span class="sep">/</span>
+          <a href="https://github.com/xyoluastudios/xyolua-filedrop#self-hosting" target="_blank" rel="noopener noreferrer" data-i18n="footer.selfhost">Host your own</a>
+        </span>
+      </footer>
+    </div>
+    <div class="toasts" id="toasts"></div>
+  </body>
+</html>
